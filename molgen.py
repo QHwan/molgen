@@ -46,6 +46,16 @@ class Total:
             num_atoms += len(residue.atom_vec)
         return num_atoms
 
+    def make_replicate(self, residue, nx=1, ny=1, nz=1, dx=0, dy=0, dz=0):
+        for i in range(nx):
+            for j in range(ny):
+                for k in range(nz):
+                    new_residue = copy.deepcopy(residue)
+                    for atom in new_residue.atom_vec:
+                        atom.atom_position[0] = ref_x + i*dx
+                        atom.atom_position[1] = ref_y + j*dy
+                        atom.atom_position[2] = ref_z + k*dz
+                    self.residue_vec.append(new_residue)
 
 def write_gro(ofilename, total):
     with open(ofilename, "w") as ofile:
@@ -88,15 +98,31 @@ def make_graphene(total, x, y, set_box=True):
     nx = int(x/(2*dx))
     ny = int(y/(2*dy+2*ccbond))
     GRA.make_periodic(nx=nx, ny=ny, nz=1, dx=2*dx, dy=2*dy+2*ccbond, dz=0)
-    tot.add_residue(GRA)
+    total.add_residue(GRA)
 
     if set_box == True:
-        tot.box[0] = nx*2*dx
-        tot.box[1] = ny*2*(dy+ccbond)
+        total.box[0] = nx*2*dx
+        total.box[1] = ny*2*(dy+ccbond)
+
+def make_water(total, position, model="SPC/E"):
+    SOL = Residue("SOL")
+    x, y, z = position
+
+    if model == "SPC/E":
+        OW = Atom("OW", [0. + x, 0. + y, 0. + z])
+        HW1 = Atom("HW1", [0.099 + x, -0.011 + y, -0.009 + z])
+        HW2 = Atom("HW2", [-0.04 + x, -0.086 + y, 0.032 + z])
+    SOL.add_atom(OW)
+    SOL.add_atom(HW1)
+    SOL.add_atom(HW2)
+
+    total.add_residue(SOL)
+
 
 
 box = [10, 10, 10]
 tot = Total(box)
 make_graphene(tot, 5, 5)
+make_water(tot, [5, 5, 5], model="SPC/E")
 ofilename = "test.gro"
 write_gro(ofilename, tot)
