@@ -78,7 +78,7 @@ def write_gro(ofilename, total):
                 ofile.write("%5d%-5s%5s%5d%8.3f%8.3f%8.3f" % (res_num, res_name, atom_name, atom_num, x, y, z))
                 ofile.write("\n")
 
-        ofile.write("%.3f\t%.3f\t%.3f" % (box[0], box[1], box[2]))
+        ofile.write("%.3f\t%.3f\t%.3f" % (total.box[0], total.box[1], total.box[2]))
         ofile.write("\n")
 
 def make_graphene(total, x, y, set_box=True):
@@ -104,6 +104,77 @@ def make_graphene(total, x, y, set_box=True):
         total.box[0] = nx*2*dx
         total.box[1] = ny*2*(dy+ccbond)
 
+def make_cristobalite(total, x, y, set_box=True):
+    CRI = Residue("CRI")
+  
+    SI1 = Atom("SI", [0., 0., 0.])
+    #SH1 = Atom("SH", [-0.246, 0.142, -0.1])
+    SI5 = Atom("SI", [-0.246, 0.142, -0.1])
+    SI2 = Atom("SI", [-0.246, 0.426, 0.])
+    #SH2 = Atom("SH", [0., 0.568, -0.1])
+    SI6 = Atom("SI", [0., 0.568, -0.1])
+    O1 = Atom("O", [-0.123, 0.071, -0.05])
+    O2 = Atom("O", [0., 0., 0.151])
+    O3 = Atom("O", [0.123, 0.071, -0.05])
+    O4 = Atom("O", [-0.246, 0.284, -0.05])
+    O5 = Atom("O", [0.123, 0.497, -0.05])
+    O6 = Atom("O", [-0.246, 0.426, 0.151])
+    O7 = Atom("O", [-0.123, 0.497, -0.05])
+    O8 = Atom("O", [0, 0.71, -0.05])
+    SI3 = Atom("SI", [0., 0., 0.302])
+    SI4 = Atom("SI", [-0.246, 0.426, 0.302])
+    SH3 = Atom("SH", [-0.246, 0.142, 0.402])
+    SH4 = Atom("SH", [0., 0.568, 0.402])
+    O9 = Atom("O", [-0.123, 0.071, 0.352])
+    O10 = Atom("O", [0.123, 0.071, 0.352])
+    O11 = Atom("O", [-0.246, 0.284, 0.352])
+    O12 = Atom("O", [0.123, 0.497, 0.352])
+    O13 = Atom("O", [-0.123, 0.497, 0.352])
+    O14 = Atom("O", [0., 0.71, 0.352])
+    #OH1 = Atom("OH", [-0.246, 0.142, -0.251])
+    #OH2 = Atom("OH", [-0, 0.567, -0.251])
+    OH1 = Atom("OH", [-0.246, 0.142, 0.553])
+    OH2 = Atom("OH", [0., 0.568, 0.553])
+    CRI.add_atom(SI1)
+    #CRI.add_atom(SH1)
+    CRI.add_atom(SI2)
+    #CRI.add_atom(SH2)
+    CRI.add_atom(SI5)
+    CRI.add_atom(SI6)
+    CRI.add_atom(O1)
+    CRI.add_atom(O2)
+    CRI.add_atom(O3)
+    CRI.add_atom(O4)
+    CRI.add_atom(O5)
+    CRI.add_atom(O6)
+    CRI.add_atom(O7)
+    CRI.add_atom(O8)
+    CRI.add_atom(SI3)
+    CRI.add_atom(SI4)
+    CRI.add_atom(SH3)
+    CRI.add_atom(SH4)
+    CRI.add_atom(O9)
+    CRI.add_atom(O10)
+    CRI.add_atom(O11)
+    CRI.add_atom(O12)
+    CRI.add_atom(O13)
+    CRI.add_atom(O14)
+    #CRI.add_atom(OH1)
+    #CRI.add_atom(OH2)
+    CRI.add_atom(OH1)
+    CRI.add_atom(OH2)
+
+    dx = 0.492
+    dy = 0.852
+    nx = int(x/dx)
+    ny = int(y/dy)
+    CRI.make_periodic(nx=nx, ny=ny, nz=1, dx=dx, dy=dy, dz=0)
+    total.add_residue(CRI)
+
+    if set_box == True:
+        total.box[0] = nx*dx
+        total.box[1] = ny*dy
+
 def make_water(total, position, model="SPC/E"):
     SOL = Residue("SOL")
     x, y, z = position
@@ -122,7 +193,7 @@ def make_water(total, position, model="SPC/E"):
 
 box = [10, 10, 10]
 tot = Total(box)
-make_graphene(tot, 5, 5)
-make_water(tot, [5, 5, 5], model="SPC/E")
+make_cristobalite(tot, 3, 3)
+#make_water(tot, [5, 5, 5], model="SPC/E")
 ofilename = "test.gro"
 write_gro(ofilename, tot)
