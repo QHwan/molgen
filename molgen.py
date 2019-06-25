@@ -1,5 +1,6 @@
 import copy
 import math
+from random import uniform
 import numpy as np
 
 class Atom:
@@ -104,7 +105,7 @@ def make_graphene(total, x, y, set_box=True):
         total.box[0] = nx*2*dx
         total.box[1] = ny*2*(dy+ccbond)
 
-def make_cristobalite(total, x, y, set_box=True):
+def make_cristobalite(total, x, y, set_box=True, bind_hydrogen=False):
     CRI = Residue("CRI")
   
     SI1 = Atom("SI", [0., 0., 0.])
@@ -164,6 +165,15 @@ def make_cristobalite(total, x, y, set_box=True):
     CRI.add_atom(OH1)
     CRI.add_atom(OH2)
 
+    if bind_hydrogen == True:
+        theta = uniform(0,360)
+        dx = 0.1*math.cos(theta*3.14/180)
+        dy = 0.1*math.sin(theta*3.14/180)
+        HH1 = Atom("HH", [-0.246+dx, 0.142+dy, 0.586])
+        HH2 = Atom("HH", [0.+dx, 0.568+dy, 0.586])
+        CRI.add_atom(HH1)
+        CRI.add_atom(HH2)
+
     dx = 0.492
     dy = 0.852
     nx = int(x/dx)
@@ -193,7 +203,14 @@ def make_water(total, position, model="SPC/E"):
 
 box = [10, 10, 10]
 tot = Total(box)
-make_cristobalite(tot, 3, 3)
+make_cristobalite(tot, 5, 5.2, bind_hydrogen=True)
+water_nx = int(4.5/0.3)
+water_ny = int(4.5/0.3)
+water_nz = int(5./0.3)
+for i in range(water_nx):
+    for j in range(water_ny):
+        for k in range(water_nz):
+            make_water(tot, [0.3*i, 0.3*j, 0.8+0.3*k], model="SPC/E")
 #make_water(tot, [5, 5, 5], model="SPC/E")
-ofilename = "test.gro"
+ofilename = "cri_q1.gro"
 write_gro(ofilename, tot)
