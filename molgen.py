@@ -22,6 +22,8 @@ class Residue:
         for i in range(nx):
             for j in range(ny):
                 for k in range(nz):
+                    if i == 0 and j == 0 and k == 0:
+                        continue
                     for ref_atom in ref_atom_vec:
                         atom_name = ref_atom.atom_name
                         ref_x, ref_y, ref_z = ref_atom.atom_position
@@ -178,6 +180,7 @@ def make_cristobalite(total, x, y, set_box=True, bind_hydrogen=False):
     dy = 0.852
     nx = int(x/dx)
     ny = int(y/dy)
+    print(nx, ny)
     CRI.make_periodic(nx=nx, ny=ny, nz=1, dx=dx, dy=dy, dz=0)
     total.add_residue(CRI)
 
@@ -204,6 +207,7 @@ def make_water(total, position, model="SPC/E"):
 box = [10, 10, 10]
 tot = Total(box)
 make_cristobalite(tot, 5, 5.2, bind_hydrogen=True)
+
 water_nx = int(4.5/0.3)
 water_ny = int(4.5/0.3)
 water_nz = int(5./0.3)
@@ -211,6 +215,6 @@ for i in range(water_nx):
     for j in range(water_ny):
         for k in range(water_nz):
             make_water(tot, [0.3*i, 0.3*j, 0.8+0.3*k], model="SPC/E")
-#make_water(tot, [5, 5, 5], model="SPC/E")
-ofilename = "cri_q1.gro"
+
+ofilename = "cri_sol_q1.0.gro"
 write_gro(ofilename, tot)
